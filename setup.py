@@ -6,9 +6,9 @@ def read(fname):
 	return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
 setup(
-	name = 'confluence',
+	name = 'pyConfluence',
 	version = '0.1',
-	url = 'http://github.com/myles/confluence',
+	url = 'http://github.com/myles/pyconfluence',
 	license = 'Apache License',
 	description = 'A python library to connect to Confluence wiki.',
 	long_description = read('README'),

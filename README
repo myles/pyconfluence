@@ -1,1 +1,5 @@
-A python library to connect to Confluence Wiki.
+============
+pyConfluence
+============
+
+pyConfluence is a python library to interface with Atlassian Confluence Wiki.

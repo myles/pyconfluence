@@ -37,7 +37,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'Confluence'
+project = u'pyConfluence'
 copyright = u'2009, Myles Braithwaite'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -158,7 +158,7 @@ html_static_path = ['_static']
 #html_file_suffix = ''
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'Confluencedoc'
+htmlhelp_basename = 'pyconfluence_doc'
 
 
 # -- Options for LaTeX output --------------------------------------------------
@@ -172,7 +172,7 @@ htmlhelp_basename = 'Confluencedoc'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'Confluence.tex', u'Confluence Documentation',
+  ('index', 'pyConfluence.tex', u'pyConfluence Documentation',
    u'Myles Braithwaite', 'manual'),
 ]
 
