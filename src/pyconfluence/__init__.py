@@ -1,1 +1,1 @@
-from confluence.client import Confluence
+from pyconfluence.client import Confluence

@@ -1,6 +1,6 @@
 import xmlrpclib
 
-from confluence.exceptions import NotImplementedException
+from pyconfluence.exceptions import NotImplementedException
 
 class ServerInfo:
 	"""
