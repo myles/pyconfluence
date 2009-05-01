@@ -28,5 +28,11 @@ setup(
 		'Operating System :: OS Independent',
 		'Programming Language :: Python',
 		'Topic :: Internet :: WWW/HTTP',
-	]
+	],
+	
+	entry_points = {
+		'console_scripts': [
+			'confluence = pyconfluence.confluence:main'
+		]
+	}
 )
