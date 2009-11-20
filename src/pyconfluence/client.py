@@ -2,7 +2,14 @@ import xmlrpclib
 
 from pyconfluence.exceptions import NotImplementedException
 
-class ServerInfo:
+class BaseResponse(object):
+	"""
+	The base class for the XML-RPC Response.
+	"""
+	def __repr(self):
+		return "<<%s>>" % str(self.__class__)
+
+class ServerInfo(BaseResponse):
 	"""
 	:param major_version: the major version number of the Confluence instance
 	:type major_version: int
@@ -42,7 +49,7 @@ class ServerInfo:
 		self.base_url = str(server_info['baseUrl'])
 		return self
 
-class SpaceSummary:
+class SpaceSummary(BaseResponse):
 	"""
 	:param key: the space key
 	:type key: str
@@ -71,7 +78,7 @@ class SpaceSummary:
 		self.url = str(space_summary['url'])
 		return self
 
-class Space:
+class Space(BaseResponse):
 	"""
 	:param key: the space key
 	:type key: str
@@ -91,7 +98,7 @@ class Space:
 		self.homepage = ''
 		self.description = ''
 
-class PageSummary:
+class PageSummary(BaseResponse):
 	"""
 	:param id: the id of the page
 	:type id: str
@@ -114,7 +121,7 @@ class PageSummary:
 		self.url = ''
 		self.locks = 0
 
-class Confluence:
+class Confluence(object):
 	"""
 	:param url: the URL to the confluence wiki.
 	:param username: if not provide will login as an anonymous user.
@@ -127,6 +134,7 @@ class Confluence:
 	
 	# *-* Authentication Methods *-*
 	
+	@property
 	def login(self, username=None, password=None):
 		"""Log a user into Confluence and returns a token. if the username
 		and password is not provided will login as an anonymous user.
@@ -144,6 +152,7 @@ class Confluence:
 			token = None
 		return token
 	
+	@property
 	def logout(self):
 		"""Removes the token from the list of logged in tokes.
 		
@@ -154,6 +163,7 @@ class Confluence:
 	
 	# -*- Administration -*-
 	
+	@property
 	def export_site(self, export_attachments):
 		"""Exports a confluence instance.
 		
@@ -164,6 +174,7 @@ class Confluence:
 		"""
 		return self.server.confluence1.exportSite(self.token, export_attchments)
 	
+	@property
 	def get_cluster_information(self):
 		"""Returns information about the cluster this node is part of.
 		
@@ -171,6 +182,7 @@ class Confluence:
 		"""
 		raise NotImplementedException
 	
+	@property
 	def get_cluster_node_statuses(self):
 		"""Returns the status of all nodes in the cluster.
 		
@@ -181,6 +193,7 @@ class Confluence:
 	
 	# -*- General -*-
 	
+	@property
 	def get_server_info(self):
 		"""Retrieve some basic information about the server connected to.
 		
@@ -195,6 +208,7 @@ class Confluence:
 	
 	# -*- Spaces Retrieval *-*
 	
+	@property
 	def get_spaces(self):
 		"""All Space Summaries that the current user can see.
 		
@@ -203,6 +217,7 @@ class Confluence:
 		"""
 		raise NotImplementedException
 	
+	@property
 	def get_space(self):
 		"""Returns a signle space.
 		
@@ -210,6 +225,7 @@ class Confluence:
 		"""
 		raise NotImplementedException
 	
+	@property
 	def export_space(self, space_key, export_type='TYPE_XML'):
 		"""Export a space and returns a URL for download. You can provide
 		an export type `TYPE_XML`, `TYPE_PDF`, or `TYPE_HTML`. The default
@@ -224,6 +240,7 @@ class Confluence:
 	
 	# -*- Spaces Management *-*
 	
+	@property
 	def add_space(self, space):
 		"""Create a new space.
 		
@@ -234,6 +251,7 @@ class Confluence:
 		"""
 		raise NotImplementedException
 	
+	@property
 	def remove_space(self, space_key):
 		"""Removes a space completely.
 		
@@ -245,6 +263,7 @@ class Confluence:
 		"""
 		raise NotImplementedException
 	
+	@property
 	def add_personal_space(self, personal_space, user_name):
 		"""Add a new space as a personal space.
 		
@@ -257,6 +276,7 @@ class Confluence:
 		"""
 		raise NotImplementedException
 	
+	@property
 	def convert_to_personal_space(self, user_name, space_key, new_space_name, update_links=True):
 		"""Convert an existing space to a personal space.
 		
