@@ -4,7 +4,7 @@
 API
 ===
 
-.. currentmodule:: confluence.client
+.. currentmodule:: pyconfluence.client
 
 .. autoclass:: Confluence
 	:members:
