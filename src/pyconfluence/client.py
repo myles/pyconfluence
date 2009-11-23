@@ -237,7 +237,7 @@ class BlogEntrySummary(object):
 	:type published_date: datetime
 	"""
 
-class BlogEntrySummary(object):
+class BlogEntry(object):
 	"""
 	:param id: the id of the blog entry
 	:type id: str
@@ -285,6 +285,128 @@ class Attachment(object):
 	:type page_id: str
 	:param title: title of the attachment
 	:type title: str
+	:param file_name: file name of the attachment
+	:type file_name: str
+	:param file_size: numeric file size of the attachment in bytes
+	:type file_size: str
+	:param content_type: mime content type of the attachment
+	:param created: creation date of the attachment
+	:type created: datetime
+	:param creator: creator of the attachment
+	:type creator: str
+	:param url: url to download the attachment online
+	:type url: str
+	:param comment: comment for the attachment
+	:type comment: str
+	"""
+
+class Comment(object):
+	"""
+	:param id: numeric id of the comment
+	:type id: str
+	:param page_id: page ID of the comment
+	:type page_id: str
+	:param title: title of the comment
+	:param content: notated content of the comment (use render_content to render)
+	:type content: str
+	:param url: url to view the comment online
+	:type url: str
+	:param created: creation date of the comment
+	:type created: datetime
+	:param creator: creator of the attachment
+	:type creator: str
+	"""
+
+class User(object):
+	"""
+	:param name: the username of this user
+	:type name: str
+	:param fullname: the full name of this user
+	:type fullname: str
+	:param email: the email address of this user
+	:type email: str
+	:param url: the url to view this user online
+	:type url: str
+	"""
+
+class ContentPermission(object):
+	"""
+	:param content_type: the type of permission. One of 'View' or 'Edit'
+	:type content_type: str
+	:param user_name: the username of the user who is permitted to see or edit the content. 'None' if this is a group permission.
+	:type user_name: str
+	:param group_name: The name of the group who is permitted to see or edit the content. 'None' if this is a user permission.
+	:type group_name: str
+	"""
+
+class ContentPermissionSet(object):
+	"""
+	:param content_type: the type of permission. One of 'View' or 'Edit'
+	:type content_type: str
+	:param content_permissions: The permissions. Each item is a ContentPermission.
+	:type content_permissions: list
+	"""
+
+class Label(object):
+	"""
+	:param name: the name of the label
+	:type name: str
+	:param owner: the username of the owner
+	:type owner: str
+	:param namespace: the namespace of the label
+	:type namespace: str
+	:param id: the ID of the label
+	:type id: int
+	"""
+
+class UserInformation(object):
+	"""
+	:param username: the username of this user
+	:type username: str
+	:param content: the user description
+	:type content: str
+	:param creator_name: the creator of the user
+	:type creator_name: str
+	:param last_modifier_name: the user who last modified
+	:type last_modifier_name: str
+	:param url: the url to view this user online
+	:type url: type
+	:param version: the version
+	:type version: int
+	:param id: the ID of the user
+	:type id: int
+	:param creation_date: the date the user was created
+	:type creation_date: datetime
+	:param last_modification_date: the date the user was last modified
+	:type last_modification_date: datetime
+	"""
+
+class ClusterInformation(object):
+	"""
+	:param is_running: true if this node is part of a cluster
+	:type is_running: bool
+	:param name: the name of the cluster
+	:type name: str
+	:param member_count: the number of nodes in hte cluster, including this node (this will be zero if this node is not clustered)
+	:type member_count: int
+	:param description: a description of the cluster
+	:type description: str
+	:param multicast_address: the address that this cluster uses for multicast communication
+	:type multicast_address: str
+	:param multicast_port: the port that this cluster uses for multicast communication
+	:type multicast_port: int
+	"""
+
+class NodeStat(object):
+	"""
+	:param node_id: an integer uniquely idetifying the node within the cluster
+	:type node_id: int
+	:param jvm_status: a dict containing attributes about the JVM memory usage of node. Keys are "total.memory", "free.memory", "used.memory"
+	:type jvm_status: dict
+	:param props: a dict containing attributes of the node Keys are "system.date", "system.time", "system.favourite.colour", "java.version", "java.vendor", "jvm.version", "jvm.vendeor", "jvm.implemtation.version", "java.runtime", "java.vm", "user.name.word", "user.timezone", "operating.system", "os.architecture", "fs.encoding"
+	:type props: dict
+	:param build_stats: a dict containing attributes of the build of Confluence running on the node. Kyes are "confluence.home", "system.uptime", "system.version", "build.number"
+	:type build_status: dict
 	"""
 
 class Confluence(object):
@@ -295,7 +417,8 @@ class Confluence(object):
 	"""
 	def __init__(self, url, username=None, password=None):
 		self.url = url
-		self.server = xmlrpclib.ServerProxy("%s%s" % (self.url, '/rpc/xmlrpc'))
+		self.server = xmlrpclib.ServerProxy("%s%s" % (self.url, '/rpc/xmlrpc'),
+			allow_none=True)
 		self.token = self.login(username, password)
 	
 	def __repr__(self):
@@ -303,7 +426,6 @@ class Confluence(object):
 	
 	# *-* Authentication Methods *-*
 	
-	@property
 	def login(self, username=None, password=None):
 		"""Log a user into Confluence and returns a token. if the username
 		and password is not provided will login as an anonymous user.
@@ -321,7 +443,6 @@ class Confluence(object):
 			token = None
 		return token
 	
-	@property
 	def logout(self):
 		"""Removes the token from the list of logged in tokes.
 		
@@ -332,7 +453,6 @@ class Confluence(object):
 	
 	# -*- Administration -*-
 	
-	@property
 	def export_site(self, export_attachments):
 		"""Exports a confluence instance.
 		
@@ -343,7 +463,6 @@ class Confluence(object):
 		"""
 		return self.server.confluence1.exportSite(self.token, export_attchments)
 	
-	@property
 	def get_cluster_information(self):
 		"""Returns information about the cluster this node is part of.
 		
@@ -351,7 +470,6 @@ class Confluence(object):
 		"""
 		raise NotImplementedException
 	
-	@property
 	def get_cluster_node_statuses(self):
 		"""Returns the status of all nodes in the cluster.
 		
@@ -362,7 +480,6 @@ class Confluence(object):
 	
 	# -*- General -*-
 	
-	@property
 	def get_server_info(self):
 		"""Retrieve some basic information about the server connected to.
 		
@@ -377,7 +494,6 @@ class Confluence(object):
 	
 	# -*- Spaces Retrieval *-*
 	
-	@property
 	def get_spaces(self):
 		"""All Space Summaries that the current user can see.
 		
@@ -386,7 +502,6 @@ class Confluence(object):
 		"""
 		raise NotImplementedException
 	
-	@property
 	def get_space(self):
 		"""Returns a signle space.
 		
@@ -394,7 +509,6 @@ class Confluence(object):
 		"""
 		raise NotImplementedException
 	
-	@property
 	def export_space(self, space_key, export_type='TYPE_XML'):
 		"""Export a space and returns a URL for download. You can provide
 		an export type `TYPE_XML`, `TYPE_PDF`, or `TYPE_HTML`. The default
@@ -409,7 +523,6 @@ class Confluence(object):
 	
 	# -*- Spaces Management *-*
 	
-	@property
 	def add_space(self, space):
 		"""Create a new space.
 		
@@ -420,7 +533,6 @@ class Confluence(object):
 		"""
 		raise NotImplementedException
 	
-	@property
 	def remove_space(self, space_key):
 		"""Removes a space completely.
 		
@@ -432,7 +544,6 @@ class Confluence(object):
 		"""
 		raise NotImplementedException
 	
-	@property
 	def add_personal_space(self, personal_space, user_name):
 		"""Add a new space as a personal space.
 		
@@ -445,7 +556,6 @@ class Confluence(object):
 		"""
 		raise NotImplementedException
 	
-	@property
 	def convert_to_personal_space(self, user_name, space_key, new_space_name, update_links=True):
 		"""Convert an existing space to a personal space.
 		
@@ -466,3 +576,89 @@ class Confluence(object):
 				return False
 		except xmlrpclib.Fault, fault:
 			raise fault
+	
+	def store_space(self, space):
+		"""Create a new space if passing in a name, key and description *or* update
+		the properties of an existing space. Only name, homepage or space group can
+		be changed.
+		
+		:param space: 
+		:type space: Space
+		
+		:returns: Space
+		"""
+		raise NotImplementedException
+	
+	def import_space(self, data):
+		"""Import a space into Confluence. *Note that this uses a lot of memory - about
+		4 times the size of the upload*. The data provided should be a zipped XML backup,
+		the same as exported by Confluence.
+		:param data: A zipped XML backup.
+		:type data: byte
+		
+		:returns: bool
+		"""
+		raise NotImplementedException
+	
+	# -*- Pages Retrieval *-*
+	# -*- Pages Management *-*
+	
+	# -*- Attachments Retrieval *-*
+	# -*- Attachments Management *-*
+	
+	# -*- Blog Entries *-*
+	
+	# -*- Search *-*
+	
+	def search(self, query, max_results=20, space_key=None, content_type=None,
+			modified=None, contributor=None):
+		"""Return a list of SearchResults which match a given search query (including
+		page and other content types).
+		
+		:param query:
+		:type query: str
+		:param max_results:
+		:type max_results: int
+		:param space_key:
+		:type space_key: str
+		:param content_type:
+		:type content_type: str
+		:param modified:
+		:type modified: str
+		:param contributor:
+		:type space_key: str
+		
+		:returns: dict
+		"""
+		parameters = {}
+		if space_key:
+			parameters['spaceKey'] = space_key
+		elif content_type:
+			parameters['type'] = content_type
+		elif modified:
+			parameters['modified'] = modified
+		elif contributor:
+			parameters['contributor']
+		else:
+			parameters = None
+		
+		try:
+			if not parameters:
+				response = self.server.confluence1.search(self.token, query, parameters,
+					max_results)
+			else:
+				response = self.server.confluence1.search(self.token, query, max_results)
+			
+			results = []
+			for r in respone:
+				results += [SearchResult(r)]
+			
+			return results
+		except xmlrpclib.Fault, fault:
+			raise fault
+	
+	# -*- Security Retrieval *-*
+	
+	# -*- User Management *-*
+	
+	# -*- Labels *-*

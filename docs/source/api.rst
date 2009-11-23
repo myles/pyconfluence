@@ -15,4 +15,34 @@ API
 
 .. autoclass:: Space
 
-..autoclass:: PageSummary
+.. autoclass:: PageSummary
+
+.. autoclass:: Page
+
+.. autoclass:: PageHistorySummary
+
+.. autoclass:: BlogEntrySummary
+
+.. autoclass:: BlogEntry
+
+.. autoclass:: RSSFeed
+
+.. autoclass:: SearchResult
+
+.. autoclass:: Attachment
+
+.. autoclass:: Comment
+
+.. autoclass:: User
+
+.. autoclass:: ContentPermission
+
+.. autoclass:: ContentPermissionSet
+
+.. autoclass:: Label
+
+.. autoclass:: UserInformation
+
+.. autoclass:: ClusterInformation
+
+.. autoclass:: NodeStat

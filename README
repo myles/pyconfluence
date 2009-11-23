@@ -2,4 +2,8 @@
 pyConfluence
 ============
 
-pyConfluence is a python library to interface with Atlassian Confluence Wiki.
+pyConfluence is a python library to interface with Atlassian_
+Confluence_ Wiki.
+
+.. _Atlassian: http://atlassian.com/
+.. _Confluence: http://www.atlassian.com/software/confluence/
