@@ -1,4 +1,4 @@
-from pyconfluence.client import Confluence
+from pyconfluence.client import Confluence, ConfluenceException
 
 __version__ = '0.1'
 __project__ = 'pyConfluence'

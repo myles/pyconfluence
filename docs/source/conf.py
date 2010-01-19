@@ -26,6 +26,8 @@ from pyconfluence import __project__, __version__, __author__, __author_email__
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 extensions = ['sphinx.ext.autodoc', 'sphinx.ext.doctest', 'sphinx.ext.intersphinx', 'sphinx.ext.todo', 'sphinx.ext.coverage']
 
+highlight_language = 'guess'
+
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 

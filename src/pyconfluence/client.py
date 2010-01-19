@@ -1,6 +1,10 @@
 import xmlrpclib
 
-from pyconfluence.exceptions import NotImplementedException
+class NotImplementedException(Exception):
+	pass
+
+class ConfluenceException(Exception):
+	pass
 
 class ServerInfo(object):
 	"""
@@ -27,6 +31,18 @@ class ServerInfo(object):
 	
 	def __repr__(self):
 		return '<%s %r>' % (type(self).__name__, self.base_url)
+	
+	def __str__(self):
+		return "Atlassian Confluence %s" % (self.version)
+	
+	def __unicode__(self):
+		return unicode(__str__)
+	
+	@property
+	def version(self):
+		return ".".join(map(str, (self.major_version,
+			self.minor_version, self.patch_level)))
+		
 	
 	def display(self, server_info):
 		"""Convert the XML-RPC varables to ServerInfo class.
@@ -65,6 +81,12 @@ class SpaceSummary(object):
 	def __repr__(self):
 		return '<%s %r>' % (type(self).__name__, self.key)
 	
+	def __str__(self):
+		return "%s" % (self.name)
+	
+	def __unicode__(self):
+		return unicode(__str__)
+	
 	def display(self, space_summary):
 		"""Convert the XML-RPC dict to the SpaceSummary class.
 		
@@ -100,6 +122,12 @@ class Space(object):
 	def __repr__(self):
 		return '<%s %r>' % (type(self).__name__, self.key)
 	
+	def __str__(self):
+		return "%s" % (self.name)
+	
+	def __unicode__(self):
+		return unicode(__str__)
+	
 	def display(self, space):
 		"""Convert the XML-RPC dict to the Space class.
 		
@@ -110,8 +138,11 @@ class Space(object):
 		self.name = str(space['name'])
 		self.type = str(space['type'])
 		self.url = str(space['url'])
-		self.homepage = str(space['homepage'])
-		self.description = str(space['description'])
+		self.homepage = str(space['homePage'])
+		try:
+			self.description = str(space['description'])
+		except KeyError:
+			self.description = None
 		return self
 
 class PageSummary(object):
@@ -140,6 +171,12 @@ class PageSummary(object):
 	def __repr__(self):
 		return '<%s %r>' % (type(self).__name__, self.id)
 	
+	def __str__(self):
+		return "%s" % (self.title)
+	
+	def __unicode__(self):
+		return unicode(__str__)
+	
 	def display(self, page_summary):
 		"""Convert the XML-RPC dict to the PageSummary class.
 		
@@ -147,10 +184,16 @@ class PageSummary(object):
 		:type space: dict
 		"""
 		self.id = str(page_summary['id'])
-		self.parent_id = str(page_summary['parent_id'])
+		try:
+			self.parent_id = str(page_summary['parent_id'])
+		except KeyError:
+			self.parent_id = None
 		self.title = str(page_summary['title'])
 		self.url = str(page_summary['url'])
-		self.locks = int(page_summary['locks'])
+		try:
+			self.locks = int(page_summary['locks'])
+		except KeyError:
+			self.locks = None
 		return self
 
 class Page(object):
@@ -206,6 +249,35 @@ class Page(object):
 	
 	def __repr__(self):
 		return '<%s %r>' % (type(self).__name__, self.id)
+	
+	def __str__(self):
+		return "%s" % (self.title)
+	
+	def __unicode__(self):
+		return unicode(__str__)
+	
+	def display(self, page):
+		"""Convert the XML-RPC dict to the Page class.
+	
+		:param space: The XML-RPC dict
+		:type space: dict
+		"""
+		self.id = str(page['id'])
+		self.space = str(page['space'])
+		self.parent_id = str(page['parent_id'])
+		self.title = str(page['title'])
+		self.url = str(page['url'])
+		self.version = int(page['version'])
+		self.content = str(page['content'])
+		self.created = str(page['created'])
+		self.creator = str(page['creator'])
+		self.modified = str(page['modified']) # TODO Convert to datetime object.
+		self.modifier = str(page['modifier'])
+		self.homepage = bool(page['homepage'])
+		self.lock = int(page['locks'])
+		self.content_status = str(page['content_status'])
+		self.current = bool(page['current'])
+		return self
 
 class PageHistorySummary(object):
 	"""
@@ -220,6 +292,38 @@ class PageHistorySummary(object):
 	:param version_comment: the comment made when the version was changed
 	:type version_comment: str
 	"""
+	
+	def __init__(self):
+		self.id = ''
+		self.version = 0
+		self.modifier = ''
+		self.modified = ''
+		self.version_comment = ''
+	
+	def __repr__(self):
+		return '<%s %r>' % (type(self).__name__, self.id)
+	
+	def __str__(self):
+		return "%s" % (self.id)
+	
+	def __unicode__(self):
+		return unicode(__str__)
+	
+	def display(self, page):
+		"""Convert the XML-RPC dict to the Page class.
+	
+		:param space: The XML-RPC dict
+		:type space: dict
+		"""
+		self.id = str(page['id'])
+		self.version = int(page['version'])
+		self.modifier = str(page['modifier'])
+		self.modified = page['modified'] # TODO Convert to datetime object.
+		try:
+			self.version_comment = str(page['versionComment'])
+		except KeyError:
+			self.version_comment = ''
+		return self
 
 class BlogEntrySummary(object):
 	"""
@@ -234,8 +338,39 @@ class BlogEntrySummary(object):
 	:param locks: the number of locks current on this page
 	:type locks: int
 	:param publish_date: the date the blog post was published
-	:type published_date: datetime
+	:type publish_date: datetime
 	"""
+	
+	def __init__(self):
+		self.id = ''
+		self.space = ''
+		self.title = ''
+		self.url = ''
+		self.locks = 0
+		self.publish_date = ''
+	
+	def __repr__(self):
+		return '<%s %r>' % (type(self).__name__, self.id)
+	
+	def __str__(self):
+		return "[%s] %s" % (self.space, self.title)
+	
+	def __unicode__(self):
+		return unicode(__str__)
+	
+	def display(self, entry):
+		"""Convert the XML-RPC dict to the Page class.
+	
+		:param space: The XML-RPC dict
+		:type space: dict
+		"""
+		self.id = str(entry['id'])
+		self.space = str(entry['space'])
+		self.title = str(entry['title'])
+		self.url = str(entry['url'])
+		self.locks = int(entry['locks'])
+		self.publish_date = entry['publishDate'] # TODO Convert to datetime object.
+		return self
 
 class BlogEntry(object):
 	"""
@@ -247,13 +382,46 @@ class BlogEntry(object):
 	:type title: str
 	:param url: the url to view this blog entry online
 	:type url: str
-	:param url: the url to view this blog entry online
-	:type url: str
+	:param version: the version number of this blog entry
+	:type version: int
 	:param content: the blog entry content
 	:type content: str
 	:param locks: the number of locks current on this page
 	:type locks: int
 	"""
+	
+	def __init__(self):
+		self.id = ''
+		self.space = ''
+		self.title = ''
+		self.url = ''
+		self.version = 0
+		self.content = ''
+		self.locks = 0
+	
+	def __repr__(self):
+		return '<%s %r>' % (type(self).__name__, self.id)
+	
+	def __str__(self):
+		return "[%s] %s" % (self.space, self.title)
+	
+	def __unicode__(self):
+		return unicode(__str__)
+	
+	def display(self, entry):
+		"""Convert the XML-RPC dict to the Page class.
+	
+		:param space: The XML-RPC dict
+		:type space: dict
+		"""
+		self.id = str(entry['id'])
+		self.space = str(entry['space'])
+		self.title = str(entry['title'])
+		self.url = str(entry['url'])
+		self.version = int(entry['version'])
+		self.content = str(entry['content'])
+		self.locks = int(entry['locks'])
+		return self
 
 class RSSFeed(object):
 	"""
@@ -262,6 +430,29 @@ class RSSFeed(object):
 	:param title: the feed's title
 	:type title: str
 	"""
+	
+	def __init__(self):
+		self.url = url
+		self.title = title
+	
+	def __repr__(self):
+		return '<%s %r>' % (type(self).__name__, self.title)
+	
+	def __str__(self):
+		return "%s" % (self.title)
+	
+	def __unicode__(self):
+		return unicode(__str__)
+	
+	def display(self, feed):
+		"""Convert the XML-RPC dict to the Page class.
+	
+		:param space: The XML-RPC dict
+		:type space: dict
+		"""
+		self.url = str(feed['url'])
+		self.title = str(feed['title'])
+		return self
 
 class SearchResult(object):
 	"""
@@ -276,6 +467,35 @@ class SearchResult(object):
 	:param id: the long ID of the result (if the type has one)
 	:type id: str
 	"""
+	
+	def __init__(self):
+		self.title = ''
+		self.url = ''
+		self.excerpt = ''
+		self.type = ''
+		self.id = ''
+	
+	def __repr__(self):
+		return '<%s %r>' % (type(self).__name__, self.title)
+	
+	def __str__(self):
+		return "%s" % (self.title)
+	
+	def __unicode__(self):
+		return unicode(__str__)
+	
+	def display(self, result):
+		"""Convert the XML-RPC dict to the Page class.
+	
+		:param space: The XML-RPC dict
+		:type space: dict
+		"""
+		self.title = str(result['title'])
+		self.url = str(result['url'])
+		self.excerpt = str(result['excerpt'])
+		self.type = str(result['type'])
+		self.id = str(result['id'])
+		return self
 
 class Attachment(object):
 	"""
@@ -337,14 +557,6 @@ class ContentPermission(object):
 	:type user_name: str
 	:param group_name: The name of the group who is permitted to see or edit the content. 'None' if this is a user permission.
 	:type group_name: str
-	"""
-
-class ContentPermissionSet(object):
-	"""
-	:param content_type: the type of permission. One of 'View' or 'Edit'
-	:type content_type: str
-	:param content_permissions: The permissions. Each item is a ContentPermission.
-	:type content_permissions: list
 	"""
 
 class Label(object):
@@ -419,7 +631,10 @@ class Confluence(object):
 		self.url = url
 		self.server = xmlrpclib.ServerProxy("%s%s" % (self.url, '/rpc/xmlrpc'),
 			allow_none=True)
-		self.token = self.login(username, password)
+		if username and password:
+			self.token = self.login(username, password)
+		else:
+			self.token = None
 	
 	def __repr__(self):
 		return '<%s %r>' % (type(self).__name__, self.url)
@@ -438,7 +653,12 @@ class Confluence(object):
 		:rtype: str
 		"""
 		if username and password:
-			token = self.server.confluence1.login(username, password)
+			try:
+				token = self.server.confluence1.login(username, password)
+			except xmlrpclib.Fault, fault:
+				raise ConfluenceException(fault.faultString)
+			except xmlrpclib.ProtocolError, err:
+				raise ConfluenceException(err.url, err.errmsg)
 		else:
 			token = None
 		return token
@@ -478,6 +698,28 @@ class Confluence(object):
 		"""
 		raise NotImplementedException
 	
+	def is_plugin_enabled(self, plugin_key):
+		"""Returns true if the plugin is installed and enabled,
+		otherwise false.
+		
+		:param plugin_key:
+		:type plugin_key: str
+		:returns:
+		:rtype: bool
+		"""
+		try:
+			response = self.server.confluence1.isPluginEnabled(self.token, plugin_key)
+			return response
+		except xmlrpclib.Fault, fault:
+			raise ConfluenceException(fault.faultString)
+	
+	def install_plugin(self):
+		"""Installs a plugin in Confluence. Returns false if the file
+		is not a JAR or XML file. Throws an exception if the
+		installation fails for another reason.
+		"""
+		raise NotImplementedException
+	
 	# -*- General -*-
 	
 	def get_server_info(self):
@@ -490,7 +732,7 @@ class Confluence(object):
 			server_info = ServerInfo().display(response)
 			return server_info
 		except xmlrpclib.Fault, fault:
-			raise fault
+			raise ConfluenceException(fault.faultString)
 	
 	# -*- Spaces Retrieval *-*
 	
@@ -500,26 +742,52 @@ class Confluence(object):
 		:returns: SpaceSummary
 		:rtype: list
 		"""
-		raise NotImplementedException
+		try:
+			responses = self.server.confluence1.getSpaces(self.token)
+			spaces = []
+			for response in responses:
+				spaces += [SpaceSummary().display(response),]
+			return spaces
+		except xmlrpclib.Fault, fault:
+			raise ConfluenceException(fault.faultString)
 	
-	def get_space(self):
+	def get_space(self, key):
 		"""Returns a signle space.
 		
+		:param key: The key to the space.
+		:type key: str
 		:returns: Space
 		"""
-		raise NotImplementedException
+		try:
+			response = self.server.confluence1.getSpace(self.token, key)
+			space = Space().display(response)
+			return space
+		except xmlrpclib.Fault, fault:
+			raise ConfluenceException(fault.faultString)
 	
 	def export_space(self, space_key, export_type='TYPE_XML'):
 		"""Export a space and returns a URL for download. You can provide
-		an export type `TYPE_XML`, `TYPE_PDF`, or `TYPE_HTML`. The default
-		is `TYPE_XML`.
+		an export type `TYPE_XML`, or `TYPE_HTML`. The default is `TYPE_XML`.
 		
 		:param space_key:
 		:type space_key: str
 		:param export_type: the type of format that you would like to export.
 		:type export_type: str
+		
+		:returns: str
 		"""
-		raise NotImplementedException
+		try:
+			response = self.server.confluence1.exportSpace(self.token, space_key, export_type)
+			return response
+		except xmlrpclib.Fault, fault:
+			raise fault
+	
+	def export_space_pdf(self, space_key):
+		try:
+			response = self.server.pdfexport.confluence1.exportSpace(self.token, space_key)
+			return response
+		except xmlrpclib.Fault, fault:
+			raise fault
 	
 	# -*- Spaces Management *-*
 	
@@ -590,17 +858,74 @@ class Confluence(object):
 		raise NotImplementedException
 	
 	def import_space(self, data):
-		"""Import a space into Confluence. *Note that this uses a lot of memory - about
-		4 times the size of the upload*. The data provided should be a zipped XML backup,
-		the same as exported by Confluence.
+		"""Import a space into Confluence. *Note that this uses a lot
+		of memory - about 4 times the size of the upload*. The data
+		provided should be a zipped XML backup, the same as exported
+		by Confluence.
+		
 		:param data: A zipped XML backup.
 		:type data: byte
-		
-		:returns: bool
+		:rtype: bool
 		"""
 		raise NotImplementedException
 	
 	# -*- Pages Retrieval *-*
+	
+	def get_pages(self, space_key):
+		"""Returns all the PageSummaries in the space. Doesn't
+		include pages which are in the Trash.
+		
+		:parma space_key:
+		:type space_key: str:
+		:rtype: list
+		"""
+		try:
+			responses = self.server.confluence1.getPages(self.token, space_key)
+			pages = []
+			for response in responses:
+				pages += [PageSummary().display(response),]
+			return pages
+		except xmlrpclib.Fault, fault:
+			raise fault
+	
+	def get_page(self, page_id):
+		"""Returns a single Page
+		
+		:param page_id:
+		:type page_id: str
+		:rtype: Page
+		"""
+		
+		raise NotImplementedException
+	
+	def get_page_title(self, page_title, space_key):
+		"""Returns a single Page
+		
+		:param space_key:
+		:type space_key: str
+		:rtype: Page
+		"""
+		
+		raise NotImplementedException
+	
+	def get_page_history(self, page_id):
+		"""Returns all the PageHistorySummaries - useful for looking
+		up the previous versions of a page, and who changed them.
+		
+		:param page_id:
+		:type page_id:
+		:rtype: list
+		"""
+		
+		try:
+			responses = self.server.confluence1.getPageHistory(self.token, page_id)
+			history = []
+			for response in responses:
+				history += [PageHistorySummary().display(response),]
+			return history
+		except xmlrpclib.Fault, fault:
+			raise fault
+	
 	# -*- Pages Management *-*
 	
 	# -*- Attachments Retrieval *-*
